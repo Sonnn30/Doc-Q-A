@@ -2,8 +2,6 @@ from pydantic import BaseModel, Field
 from typing import Optional
 
 
-# ── Upload ──────────────────────────────────────────────────────────────────
-
 class UploadResponse(BaseModel):
     session_id: str = Field(..., description="ID sesi unik untuk Q&A berikutnya")
     filename: str = Field(..., description="Nama file yang diupload")
@@ -20,8 +18,6 @@ class UploadResponse(BaseModel):
             }
         }
 
-
-# ── Chat ─────────────────────────────────────────────────────────────────────
 
 class ChatMessage(BaseModel):
     role: str = Field(..., description="'user' atau 'assistant'")
@@ -58,7 +54,6 @@ class AskResponse(BaseModel):
         }
 
 
-# ── Session ──────────────────────────────────────────────────────────────────
 
 class SessionInfo(BaseModel):
     session_id: str
