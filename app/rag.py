@@ -1,10 +1,3 @@
-"""
-rag.py — Core RAG engine
-Alur:
-  Upload  → load_document → split chunks → embed → simpan ke ChromaDB (per session)
-  Ask     → embed pertanyaan → retrieve chunks → kirim ke Groq LLM + history → jawaban
-"""
-
 import os
 import uuid
 from pathlib import Path
@@ -22,23 +15,18 @@ from app.loaders import load_document
 
 load_dotenv()
 
-# ── Konfigurasi ──────────────────────────────────────────────────────────────
-
 CHROMA_DIR   = os.getenv("CHROMA_DIR", "./chroma_db")
 GROQ_MODEL   = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
 RETRIEVAL_K  = int(os.getenv("RETRIEVAL_K", "4"))
 
-# ── In-memory session store ──────────────────────────────────────────────────
-# Format: { session_id: { "filename": str, "chunk_count": int, "history": [...] } }
+
 _sessions: dict[str, dict[str, Any]] = {}
 
-# ── Singleton embeddings (load sekali, reuse) ────────────────────────────────
 _embeddings = None
 
 def _get_embeddings() -> HuggingFaceEmbeddings:
     global _embeddings
     if _embeddings is None:
-        # Model ringan, jalan lokal, tidak butuh API key
         _embeddings = HuggingFaceEmbeddings(
             model_name="sentence-transformers/all-MiniLM-L6-v2",
             model_kwargs={"device": "cpu"},
@@ -69,8 +57,6 @@ def _get_vectorstore(session_id: str) -> Chroma:
     )
 
 
-# ── Upload & Indexing ─────────────────────────────────────────────────────────
-
 def process_file(file_path: Path, file_ext: str, filename: str) -> dict[str, Any]:
     """
     Load → split → embed → simpan ke ChromaDB.
@@ -100,7 +86,7 @@ def process_file(file_path: Path, file_ext: str, filename: str) -> dict[str, Any
     _sessions[session_id] = {
         "filename": filename,
         "chunk_count": len(docs),
-        "history": [],  # list of LangChain message objects
+        "history": [], 
     }
 
     return {"session_id": session_id, "chunk_count": len(docs)}
@@ -123,7 +109,6 @@ def ask(session_id: str, question: str) -> dict[str, Any]:
     Retrieve relevan chunks → bangun prompt dengan history → tanya Groq → simpan ke history.
     Return: { answer, sources, history_length }
     """
-    # Validasi session
     if session_id not in _sessions:
         raise ValueError(
             f"Session '{session_id}' tidak ditemukan. "
@@ -182,7 +167,6 @@ def ask(session_id: str, question: str) -> dict[str, Any]:
     }
 
 
-# ── Session Management ────────────────────────────────────────────────────────
 
 def get_session_info(session_id: str) -> dict[str, Any]:
     if session_id not in _sessions:
@@ -206,7 +190,7 @@ def delete_session(session_id: str) -> None:
         vectorstore = _get_vectorstore(session_id)
         vectorstore.delete_collection()
     except Exception:
-        pass  # Lanjutkan meski gagal hapus dari ChromaDB
+        pass  
 
     # Hapus dari memory
     del _sessions[session_id]
