@@ -37,7 +37,7 @@ ALLOWED_EXTENSIONS = {".pdf", ".docx", ".txt", ".md"}
 MAX_FILE_SIZE_MB = 20
 
 
-# ── Health ────────────────────────────────────────────────────────────────────
+
 
 @app.get("/", tags=["Health"])
 def root():
@@ -47,7 +47,6 @@ def root():
     }
 
 
-# ── Upload ────────────────────────────────────────────────────────────────────
 
 @app.post("/upload", response_model=UploadResponse, tags=["RAG"])
 async def upload_file(
@@ -72,7 +71,6 @@ async def upload_file(
             detail=f"File terlalu besar ({size_mb:.1f} MB). Maksimal {MAX_FILE_SIZE_MB} MB.",
         )
 
-    # Simpan sementara ke disk
     tmp_path = UPLOAD_DIR / f"{uuid.uuid4()}{ext}"
     tmp_path.write_bytes(content)
 
@@ -95,7 +93,6 @@ async def upload_file(
     )
 
 
-# ── Ask ───────────────────────────────────────────────────────────────────────
 
 @app.post("/ask", response_model=AskResponse, tags=["RAG"])
 def ask_question(body: AskRequest):
@@ -122,7 +119,6 @@ def ask_question(body: AskRequest):
     )
 
 
-# ── Session Management ────────────────────────────────────────────────────────
 
 @app.get("/sessions", response_model=list[SessionInfo], tags=["Session"])
 def get_all_sessions():
