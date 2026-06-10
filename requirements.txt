@@ -1,0 +1,25 @@
+fastapi>=0.111.0
+uvicorn[standard]>=0.30.0
+python-multipart>=0.0.9
+
+# LLM
+groq>=0.9.0
+langchain>=0.3.0
+langchain-groq>=0.2.0
+langchain-community>=0.3.0
+langchain-core>=0.3.0
+
+# Vector store
+chromadb>=0.5.0
+langchain-chroma>=0.1.0
+
+# Embeddings (lokal, gratis)
+sentence-transformers>=3.0.0
+
+# Document loaders
+pdfplumber>=0.11.0
+PyPDF2>=3.0.0
+python-docx>=1.1.0
+
+# Utilities
+python-dotenv>=1.0.0
